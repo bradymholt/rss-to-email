@@ -6,12 +6,10 @@ on:
 jobs:
   process:
     runs-on: ubuntu-latest
-    steps:      
+    steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.19.0
-      - run: npm ci      
+      - uses: asdf-vm/actions/install@v1
+      - run: npm ci
       - run: ./src/scripts/process.ts
         env:
-          SMTP_GMAIL: ${{ secrets.SMTP_GMAIL }}          
+          SMTP_GMAIL: ${{ secrets.SMTP_GMAIL }}
