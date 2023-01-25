@@ -13,3 +13,7 @@ jobs:
       - run: ./src/scripts/process.ts
         env:
           SMTP_GMAIL: ${{ secrets.SMTP_GMAIL }}
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          file_pattern: "data/*.sqlite"
+          commit_message: Update database after processing
