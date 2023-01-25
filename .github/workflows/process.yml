@@ -1,0 +1,17 @@
+name: Process
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * *" # Every day at 12AM
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:      
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+        node-version: 16
+      - run: npm ci      
+      - run: ./src/scripts/process.ts
+        env:
+          SMTP_GMAIL: ${{ secrets.SMTP_GMAIL }}          
