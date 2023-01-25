@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 export const AppDataSource = new DataSource({
   type: "sqlite",
-  database: "database.sqlite",
+  database: path.join(__dirname, "../data/database.sqlite"),
   synchronize: true,
   logging: false,
   entities: [path.join(__dirname, "./entity/*.ts")],
