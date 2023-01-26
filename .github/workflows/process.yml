@@ -6,16 +6,16 @@ on:
 jobs:
   process:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: main
+      - uses: actions/checkout@v3        
       - uses: asdf-vm/actions/install@v1
       - run: npm ci
       - run: ./src/scripts/process.ts
         env:
           SMTP_GMAIL: ${{ secrets.SMTP_GMAIL }}
-      - uses: EndBug/add-and-commit@v9
+      - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          add: "data/*.sqlite"
-          message: Update database after processing
+          file_pattern: "data/*.sqlite"
+          commit_message: Update database after processing
