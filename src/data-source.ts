@@ -9,7 +9,7 @@ export const AppDataSource = new DataSource({
   type: "sqlite",
   database: path.join(__dirname, "../data/database.sqlite"),
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: [path.join(__dirname, "./entity/*.ts")],
   migrations: [],
   subscribers: [],

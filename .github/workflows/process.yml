@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3        
       - uses: asdf-vm/actions/install@v1
       - run: npm ci
-      - run: ./src/scripts/process.ts
+      - run: ./process.sh
         env:
           SMTP_GMAIL: ${{ secrets.SMTP_GMAIL }}
       - uses: stefanzweifel/git-auto-commit-action@v4
