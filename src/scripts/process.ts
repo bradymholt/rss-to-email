@@ -32,7 +32,13 @@ for (const feed of allFeeds) {
 
   for (const item of itemsToBeSent) {
     echo(`Sending email for ${item.title} (${item.link}) ...`);
-    await sendEmail(`New Feed Item:${feed.title}:${item.title}`, item.content);
+    const emailBody = `\
+<h1>Feed: ${feed.title}</h1>
+<h2>${item.title}</h2>
+<p>Direct Link: <a href="${item.link}">${item.link}</a></p>
+${item.content}
+`;
+    await sendEmail(`[rss-to-email] New post from ${feed.title}`, emailBody);
 
     const newFeedItem = new UserFeedItem();
     newFeedItem.linkUrl = item.link!;
