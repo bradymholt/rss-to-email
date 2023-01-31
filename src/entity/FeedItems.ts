@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Relation, ManyToOne
 import { Feed } from "./Feed.js";
 
 @Entity()
-export class UserFeedItem extends BaseEntity {
+export class FeedItems extends BaseEntity { 
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -10,8 +10,8 @@ export class UserFeedItem extends BaseEntity {
   feed: Relation<Feed>;
 
   @Column()
-  linkUrl: string;
+  guid: string;
 
   @Column()
-  delivered: boolean;
+  emailSentAtEpoch: number;
 }

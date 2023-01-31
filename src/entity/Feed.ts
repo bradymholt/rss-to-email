@@ -1,10 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Relation, OneToMany } from "typeorm";
-import { UserFeedItem } from "./UserFeedItems.js";
+import { FeedItems } from "./FeedItems.js";
 
 @Entity()
 export class Feed extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: number;    
+  id: number;
 
   @Column()
   title: string;
@@ -15,6 +15,6 @@ export class Feed extends BaseEntity {
   @Column()
   createdAtEpoch: number;
 
-  @OneToMany(() => UserFeedItem, (item) => item.feed)
-  items: Relation<UserFeedItem[]>;
+  @OneToMany(() => FeedItems, (item) => item.feed)
+  items: Promise<Relation<FeedItems[]>>;
 }

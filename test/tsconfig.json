@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true
+  },
+  "include": ["**/*.ts"],
+  "references": [{ "path": "../src" }]
+}

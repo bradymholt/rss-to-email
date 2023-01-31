@@ -2,23 +2,23 @@
 import "jsh";
 import { AppDataSource } from "../data-source.js";
 import { Feed } from "../entity/Feed.js";
-import { fetchFeedTitle } from "../lib/FeedParser.js";
+import { fetchFeed } from "syndication-fetcher";
 
 const [url] = args.assertCount(1);
 
 await AppDataSource.initialize();
 
-const existingFeedByUrl = await Feed.findBy({ url });
+const existingFeedByUrl = await Feed.findOneBy({ url });
 if (existingFeedByUrl) {
   throw new Error(`Feed already exists: ${url}`);
 }
 
 echo(`Fetching feed at ${url} ...`);
-const title = await fetchFeedTitle(url);
+const feed = await fetchFeed(url);
 
 const newFeed = new Feed();
 newFeed.url = url;
-newFeed.title = title;
+newFeed.title = feed.title;
 newFeed.createdAtEpoch = Date.now();
 await newFeed.save();
 
