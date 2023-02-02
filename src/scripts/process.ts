@@ -19,7 +19,10 @@ for (const feed of allFeeds) {
   const itemsToBeSent: Array<IFeedItem> = [];
 
   for (let fetchedItem of fetchedFeed.items) {
-    if (fetchedItem.publishedEpoch <= feed.createdAtEpoch) {
+    if (!fetchedItem.pubDate) continue;
+
+    const fetchedItemPubDateEpoch = new Date(fetchedItem.pubDate).getTime();
+    if (fetchedItemPubDateEpoch <= feed.createdAtEpoch) {
       echo(`\
   ${fetchedItem.id} [published before feed added]`);
     } else if (itemsSentByGuid.includes(fetchedItem.id)) {
