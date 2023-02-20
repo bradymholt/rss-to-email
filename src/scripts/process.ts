@@ -3,7 +3,7 @@ import "jsh";
 
 import { AppDataSource } from "../data-source.js";
 import { Feed } from "../entity/Feed.js";
-import { FeedItems } from "../entity/FeedItems.js";
+import { FeedItem } from "../entity/FeedItem.js";
 import { sendEmail } from "../lib/Mailer.js";
 import { fetchFeed } from "syndication-fetcher";
 import type { IFeed, IFeedItem } from "syndication-fetcher";
@@ -39,7 +39,7 @@ for (const feed of allFeeds) {
   if (!itemsToBeSent) continue;
 
   for (const item of itemsToBeSent) {
-    const content = scrubFeedContent(item.content);
+    const content = scrubFeedContent(feed, item.content);
     echo(`Sending email for ${item.title} (${item.link}) ...`);
     const emailBody = `\
 <h1>Feed: ${feed.title}</h1>
@@ -48,7 +48,7 @@ for (const feed of allFeeds) {
 ${content}
 `;
     await sendEmail(`[rss-to-email] New post from ${feed.title}`, emailBody);
-    await FeedItems.insert({ feed, guid: item.id, emailSentAtEpoch: Date.now() });
+    await FeedItem.insert({ feed, guid: item.id, emailSentAtEpoch: Date.now() });
   }
 }
 

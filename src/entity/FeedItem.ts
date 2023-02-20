@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Relation, ManyToOne } from "typeorm";
 import { Feed } from "./Feed.js";
 
-@Entity()
-export class FeedItems extends BaseEntity { 
+@Entity({name: "feed_items"})
+export class FeedItem extends BaseEntity { 
   @PrimaryGeneratedColumn()
   id: number;
 
