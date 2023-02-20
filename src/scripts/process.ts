@@ -7,6 +7,7 @@ import { FeedItems } from "../entity/FeedItems.js";
 import { sendEmail } from "../lib/Mailer.js";
 import { fetchFeed } from "syndication-fetcher";
 import type { IFeed, IFeedItem } from "syndication-fetcher";
+import { scrubFeedContent } from "../lib/FeedHelper.js";
 
 await AppDataSource.initialize();
 
@@ -38,12 +39,13 @@ for (const feed of allFeeds) {
   if (!itemsToBeSent) continue;
 
   for (const item of itemsToBeSent) {
+    const content = scrubFeedContent(item.content);
     echo(`Sending email for ${item.title} (${item.link}) ...`);
     const emailBody = `\
 <h1>Feed: ${feed.title}</h1>
 <h2>${item.title}</h2>
 <p>Direct Link: <a href="${item.link}">${item.link}</a></p>
-${item.content}
+${content}
 `;
     await sendEmail(`[rss-to-email] New post from ${feed.title}`, emailBody);
     await FeedItems.insert({ feed, guid: item.id, emailSentAtEpoch: Date.now() });
