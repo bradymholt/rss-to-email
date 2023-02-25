@@ -9,8 +9,9 @@
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "strict": true,
-    "outDir": "../build/",
+    "outDir": "./build/",
     "composite": true
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts"],
+  "exclude": ["test/"]
 }

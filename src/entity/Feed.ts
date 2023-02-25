@@ -1,7 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Relation, OneToMany } from "typeorm";
 import { FeedItem } from "./FeedItem.js";
 
-@Entity({name: "feeds"})
+export enum FeedBatching {
+  None,
+  Weekly,
+  Monthly,
+}
+
+@Entity({ name: "feeds" })
 export class Feed extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,6 +20,12 @@ export class Feed extends BaseEntity {
 
   @Column()
   createdAtEpoch: number;
+
+  @Column({ default: FeedBatching.None })
+  batching: FeedBatching;
+
+  @Column({ nullable: true})
+  lastEmailSentAtEpoch: number;
 
   @OneToMany(() => FeedItem, (item) => item.feed)
   items: Promise<Relation<FeedItem[]>>;

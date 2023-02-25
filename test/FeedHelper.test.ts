@@ -1,8 +1,8 @@
 import { Feed } from "../src/entity/Feed";
-import { scrubFeedContent } from "../src/lib/FeedHelper";
+import { daysBetweenDates, scrubFeedContent } from "../src/lib/FeedHelper";
 
 describe("FeedHelper", () => {
-  it("scrubFeedContent", () => {    
+  it("scrubFeedContent", () => {
     const feed = new Feed();
     feed.id = 1;
     feed.title = "Test";
@@ -12,5 +12,13 @@ describe("FeedHelper", () => {
     expect(scrubFeedContent(feed, `This is a test. <img src="/foo.jpg" /> This is only a test.`)).toBe(
       `This is a test. <img src="https://example.com/foo.jpg" /> This is only a test.`
     );
+  });
+
+  it("daysBetweenDates", () => {
+    const date = new Date();
+    let date2 = date;
+    expect(daysBetweenDates(date, date2)).toBe(0);
+    date2 = new Date(date.getTime() + 1000 * 60 * 60 * 24 * 7);
+    expect(daysBetweenDates(date, date2)).toBe(7);
   });
 });

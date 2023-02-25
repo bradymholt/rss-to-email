@@ -7,22 +7,28 @@ import { FeedItem } from "../entity/FeedItem.js";
 import { sendEmail } from "../lib/Mailer.js";
 import { fetchFeed } from "syndication-fetcher";
 import type { IFeed, IFeedItem } from "syndication-fetcher";
-import { scrubFeedContent } from "../lib/FeedHelper.js";
+import { isFeedItemDueForDelivery, scrubFeedContent } from "../lib/FeedHelper.js";
 
 await AppDataSource.initialize();
 
+const itemsToBeSentGroupedById: { [feedId: string]: Array<IFeedItem> } = {};
 const allFeeds = await Feed.find();
+const feedsById = allFeeds.reduce((acc, feed) => {
+  acc[feed.id] = feed;
+  return acc;
+}, {} as { [feedId: string]: Feed });
+
 for (const feed of allFeeds) {
   echo(`Processing feed: ${feed.title} (${feed.url}) ...`);
   const feedItems = await feed.items;
+  const feedBatching = feed.batching;
   const itemsSentByGuid = (feedItems && feedItems.map((item) => item.guid)) || [];
   const fetchedFeed = await fetchFeed(feed.url);
-  const itemsToBeSent: Array<IFeedItem> = [];
 
   for (let fetchedItem of fetchedFeed.items) {
     if (!fetchedItem.pubDate) continue;
 
-    const fetchedItemPubDateEpoch = new Date(fetchedItem.pubDate).getTime();
+    const fetchedItemPubDateEpoch = fetchedItem.pubDate.getTime();
     if (fetchedItemPubDateEpoch <= feed.createdAtEpoch) {
       echo(`\
   ${fetchedItem.id} [published before feed added]`);
@@ -30,26 +36,48 @@ for (const feed of allFeeds) {
       echo(`\
   ${fetchedItem.id} [already sent]`);
     } else {
-      echo.green(`\
+      const isDueForDelivery = isFeedItemDueForDelivery(feed, fetchedItem);
+      if (!isDueForDelivery) {
+        echo(`\
+  ${fetchedItem.id} [not due for delivery yet]`);
+      } else {
+        echo.green(`\
   ${fetchedItem.id} [new]`);
-      itemsToBeSent.push(fetchedItem);
+        itemsToBeSentGroupedById[feed.id] = itemsToBeSentGroupedById[feed.id] ?? []; // ensure array initialized for feedId
+        itemsToBeSentGroupedById[feed.id].push(fetchedItem);
+      }
     }
   }
+}
 
-  if (!itemsToBeSent) continue;
+if (Object.keys(itemsToBeSentGroupedById).length == 0) {
+  // Nothing to send
+  exit();
+}
 
-  for (const item of itemsToBeSent) {
-    const content = scrubFeedContent(feed, item.content);
-    echo(`Sending email for ${item.title} (${item.link}) ...`);
-    const emailBody = `\
-<h1>Feed: ${feed.title}</h1>
-<h2>${item.title}</h2>
-<p>Direct Link: <a href="${item.link}">${item.link}</a></p>
-${content}
-`;
-    await sendEmail(`[rss-to-email] New post from ${feed.title}`, emailBody);
-    await FeedItem.insert({ feed, guid: item.id, emailSentAtEpoch: Date.now() });
+// Send one email per feed
+for (const feedId of Object.keys(itemsToBeSentGroupedById)) {
+  const feed = feedsById[feedId];
+  const feedIdItemsToBeSent = itemsToBeSentGroupedById[feedId];
+  let emailBody = `<h1>Feed: ${feed.title} (items: ${feedIdItemsToBeSent.length})</h1>`;
+
+  for (const feedItem of feedIdItemsToBeSent) {
+    const itemContent = scrubFeedContent(feed, feedItem.content);
+
+    emailBody += `\
+<h2>${feedItem.title}</h2>
+<p>Direct Link: <a href="${feedItem.link}">${feedItem.link}</a></p>
+${itemContent}`;
   }
+
+  echo(`Sending email for feed '${feed.url}' (id: ${feedId}) ...`);
+
+  await sendEmail(`[rss-to-email] New post from ${feed.title}`, emailBody);
+  for (const feedItem of feedIdItemsToBeSent) {
+    await FeedItem.insert({ feed, guid: feedItem.id, emailSentAtEpoch: Date.now() });
+  }
+
+  await Feed.update(feedId, { lastEmailSentAtEpoch: +Date.now() });
 }
 
 await AppDataSource.destroy();
