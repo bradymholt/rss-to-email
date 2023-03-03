@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "strict": true,
     "outDir": "./build/",
-    "composite": true
+    "composite": true,
+    "noEmit": true
   },
   "include": ["**/*.ts"],
   "exclude": ["test/"]

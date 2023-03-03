@@ -12,10 +12,13 @@ export function isFeedItemDueForDelivery(feed: Feed, item: IFeedItem) {
 
   switch (feed.batching) {
     case FeedBatching.None:
+    case FeedBatching.DailyBatch:
       return true;
     case FeedBatching.Weekly:
+    case FeedBatching.WeeklyBatch:
       return daysBetweenDates(new Date(feed.lastEmailSentAtEpoch), item.pubDate) >= 7;
     case FeedBatching.Monthly:
+    case FeedBatching.MonthlyBatch:
       return daysBetweenDates(new Date(feed.lastEmailSentAtEpoch), item.pubDate) >= 30;
     default:
       ((x: never) => {

@@ -5,6 +5,9 @@ export enum FeedBatching {
   None,
   Weekly,
   Monthly,
+  DailyBatch,
+  WeeklyBatch,
+  MonthlyBatch,
 }
 
 @Entity({ name: "feeds" })
@@ -24,7 +27,7 @@ export class Feed extends BaseEntity {
   @Column({ default: FeedBatching.None })
   batching: FeedBatching;
 
-  @Column({ nullable: true})
+  @Column({ nullable: true })
   lastEmailSentAtEpoch: number;
 
   @OneToMany(() => FeedItem, (item) => item.feed)
