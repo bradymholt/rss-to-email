@@ -7,10 +7,10 @@ const fromEmail = SMTP_GMAIL.split(":")[1].replace("//", "");
 const toEmail = fromEmail;
 
 export function sendEmail(subject: string, html: string) {
-  return transporter.sendMail({
-    from: fromEmail,
-    to: toEmail,
-    subject,
-    html,
-  });
+  // return transporter.sendMail({
+  //   from: fromEmail,
+  //   to: toEmail,
+  //   subject,
+  //   html,
+  // });
 }

@@ -91,7 +91,7 @@ ${itemContent}`;
 let emailBody = "";
 for (const feedId of Object.keys(batchedItemsToBeSentGroupedById)) {
   const feed = feedsById[feedId];
-  const feedIdItemsToBeSent = itemsToBeSentGroupedById[feedId];
+  const feedIdItemsToBeSent = batchedItemsToBeSentGroupedById[feedId];
 
   emailBody += `<h1>Feed: ${feed.title} (items: ${feedIdItemsToBeSent.length})</h1>`;
   for (const feedItem of feedIdItemsToBeSent) {
@@ -111,10 +111,3 @@ ${itemContent}`;
 await sendEmail(`[rss-to-email] New batch posts!`, emailBody);
 
 await AppDataSource.destroy();
-
-// None,
-// Weekly,
-// Monthly,
-// DailyBatch,
-// WeeklyBatch,
-// MonthlyBatch,
