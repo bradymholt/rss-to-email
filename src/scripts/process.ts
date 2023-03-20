@@ -88,6 +88,7 @@ ${itemContent}`;
 }
 
 // Batched items
+if (Object.keys(batchedItemsToBeSentGroupedById).length > 0) {
 let emailBody = "";
 for (const feedId of Object.keys(batchedItemsToBeSentGroupedById)) {
   const feed = feedsById[feedId];
@@ -109,5 +110,6 @@ ${itemContent}`;
 }
 
 await sendEmail(`[rss-to-email] New batch posts!`, emailBody);
+}
 
 await AppDataSource.destroy();
