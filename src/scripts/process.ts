@@ -89,27 +89,27 @@ ${itemContent}`;
 
 // Batched items
 if (Object.keys(batchedItemsToBeSentGroupedById).length > 0) {
-let emailBody = "";
-for (const feedId of Object.keys(batchedItemsToBeSentGroupedById)) {
-  const feed = feedsById[feedId];
-  const feedIdItemsToBeSent = batchedItemsToBeSentGroupedById[feedId];
+  let emailBody = "";
+  for (const feedId of Object.keys(batchedItemsToBeSentGroupedById)) {
+    const feed = feedsById[feedId];
+    const feedIdItemsToBeSent = batchedItemsToBeSentGroupedById[feedId];
 
-  emailBody += `<h1>Feed: ${feed.title} (items: ${feedIdItemsToBeSent.length})</h1>`;
-  for (const feedItem of feedIdItemsToBeSent) {
-    const itemContent = scrubFeedContent(feed, feedItem.content);
+    emailBody += `<h1>Feed: ${feed.title} (items: ${feedIdItemsToBeSent.length})</h1>`;
+    for (const feedItem of feedIdItemsToBeSent) {
+      const itemContent = scrubFeedContent(feed, feedItem.content);
 
-    emailBody += `\
+      emailBody += `\
 <h2>${feedItem.title}</h2>
 <p>Direct Link: <a href="${feedItem.link}">${feedItem.link}</a></p>
 ${itemContent}`;
 
-    await FeedItem.insert({ feed, guid: feedItem.id, emailSentAtEpoch: Date.now() });
+      await FeedItem.insert({ feed, guid: feedItem.id, emailSentAtEpoch: Date.now() });
+    }
+
+    await Feed.update(feedId, { lastEmailSentAtEpoch: +Date.now() });
   }
 
-  await Feed.update(feedId, { lastEmailSentAtEpoch: +Date.now() });
-}
-
-await sendEmail(`[rss-to-email] New batch posts!`, emailBody);
+  await sendEmail(`[rss-to-email] New batch posts!`, emailBody);
 }
 
 await AppDataSource.destroy();
